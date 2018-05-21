@@ -23,7 +23,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.enabled = true;
 
 	// "target" sets the location of focus, where the object orbits around
-	this.target = new THREE.Vector3();
+	this.target = new THREE.Object3D();
 
 	// How far you can dolly in and out ( PerspectiveCamera only )
 	this.minDistance = 0;
@@ -78,7 +78,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 
 	// for reset
-	this.target0 = this.target.clone();
+	this.target0 = this.target.position.clone();
 	this.position0 = this.object.position.clone();
 	this.zoom0 = this.object.zoom;
 
@@ -100,7 +100,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.saveState = function () {
 
-		scope.target0.copy( scope.target );
+		scope.target0.copy( scope.target.position );
 		scope.position0.copy( scope.object.position );
 		scope.zoom0 = scope.object.zoom;
 
@@ -108,7 +108,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.reset = function () {
 
-		scope.target.copy( scope.target0 );
+		scope.target.position.copy( scope.target0 );
 		scope.object.position.copy( scope.position0 );
 		scope.object.zoom = scope.zoom0;
 
@@ -137,7 +137,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			var position = scope.object.position;
 
-			offset.copy( position ).sub( scope.target );
+			offset.copy( position ).sub( scope.target.position );
 
 			// rotate offset to "y-axis-is-up" space
 			offset.applyQuaternion( quat );
@@ -169,16 +169,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 			spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
 
 			// move target to panned location
-			scope.target.add( panOffset );
+			scope.target.position.add( panOffset );
 
 			offset.setFromSpherical( spherical );
 
 			// rotate offset back to "camera-up-vector-is-up" space
 			offset.applyQuaternion( quatInverse );
 
-			position.copy( scope.target ).add( offset );
+			position.copy( scope.target.position ).add( offset );
 
-			scope.object.lookAt( scope.target );
+			scope.object.lookAt( scope.target.position );
 
 			if ( scope.enableDamping === true ) {
 
@@ -353,7 +353,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				// perspective
 				var position = scope.object.position;
-				offset.copy( position ).sub( scope.target );
+				offset.copy( position ).sub( scope.target.position );
 				var targetDistance = offset.length();
 
 				// half of the fov is center to top of screen
@@ -924,7 +924,7 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
 		get: function () {
 
 			console.warn( 'THREE.OrbitControls: .center has been renamed to .target' );
-			return this.target;
+			return this.target.position;
 
 		}
 
